@@ -1,0 +1,31 @@
+{% extends "layout.html" %} {% block header %}Resources{% endblock %} {% block
+content %}
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">S</th>
+      <th scope="col">R</th>
+      <th scope="col">D</th>
+      <th scope="col">T</th>
+      <th scope="col">Risk(Averages)</th>
+      <th scope="col">Compute time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in vals %}
+    <tr>
+      <th scope="row">{{loop.index}}</th>
+      <td>{{ i["s"] }}</td>
+      <td>{{ i["q"] }}</td>
+      <td>{{ i["r"] }}</td>
+      <td>{{ i["d"] }}</td>
+      <td>{{ i["pi_estimate"] }}</td>
+      <td>{{ i["cost"] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "layout.html" %}{% block head%} {% endblock %} {% block header
+%}Service{% endblock %} {% block content %}
+<!-- <h1>login</h1> -->
+<form method="POST" action="#">
+  <!-- <p><input type="text" name="nm" /></p> -->
+
+  <div class="form-check">
+    <h2>Select scalable service to use:</h2>
+    <input
+      class="form-check-input"
+      type="radio"
+      name="service"
+      id="service1"
+      value="ec2"
+      checked
+    />
+    <label class="form-check-label" for="service1"> EC2 </label>
+  </div>
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      name="service"
+      id="service2"
+      value="lambda"
+    />
+    <label class="form-check-label" for="service2"> AWS Lambda </label>
+  </div>
+  <br /><br />
+
+  <div class="form-group">
+    <label for="exampleFormControlSelect2">How many resources?</label>
+    <select
+      multiple
+      class="form-control"
+      name="resources"
+      id="exampleFormControlSelect2"
+    >
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+  </div>
+
+  <button
+    onclick="$('#loading').show();"
+    type="submit"
+    class="btn btn-primary my-1"
+  >
+    Warm up resources
+  </button>
+</form>
+
+{% endblock %}
