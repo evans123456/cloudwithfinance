@@ -4,39 +4,33 @@
 <div class="container-fluid form-group">
 <form method="POST" action="#">
   <!-- <p><input type="text" name="nm" /></p> -->
-
-  <div class="form-group">
-  <label class="form-check-label" for="H"> H </label>
-    <input
-      class="form-check-input"
-      type="number"
-      name="flexRadioDefault"
-      id="H"
-      value="00"
-    />
-    
+   <div class="form-group">
+    <label for="exampleInputEmail1">H</label>
+    <input type="number" name="h" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="200">
+    <small id="emailHelp" class="form-text text-muted">Length of price history from which to generate the mean and standard deviation</small>
+  </div>
+   <div class="form-group">
+    <label for="exampleInputEmail1">D</label>
+    <input type="number" name="d" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="100000">
+    <small id="emailHelp" class="form-text text-muted">the number of data points (shots) to use by each R for calculating risk</small>
   </div>
 
-  <div class="form-group">
-  <label class="form-check-label" for="D"> D </label>
-    <input
-      class="form-check-input"
-      type="number"
-      name="flexRadioDefault"
-      id="D"
-      value="1000000"
-    />
-  </div>
 
-  <div class="form-group">
-  <label class="form-check-label" for="T"> T </label>
-    <input
-      class="form-check-input"
-      type="text"
-      name="flexRadioDefault"
-      id="T"
-      value="lambda"
-    />
+   <div class="form-group">
+    <label for="exampleInputEmail1">T</label>
+    <div class="form-check">
+  <input class="form-check-input" type="radio" name="t" id="exampleRadios1" value="1" checked>
+  <label class="form-check-label" for="exampleRadios1">
+    Buy
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="t" id="exampleRadios2" value="0">
+  <label class="form-check-label" for="exampleRadios2">
+    Sell
+  </label>
+</div>
+    <small id="emailHelp" class="form-text text-muted">Buy or Sell to allow for separate analysis of each type of signal</small>
   </div>
 
   <button

@@ -1,4 +1,3 @@
 pandas
 yfinance
 pandas_datareader
-flask

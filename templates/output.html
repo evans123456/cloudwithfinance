@@ -1,0 +1,25 @@
+{% extends "layout.html" %} {% block header %}Resources{% endblock %} {% block
+content %}
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Signal Date</th>
+      <th scope="col">95%</th>
+      <th scope="col">99%</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in content %}
+    <tr>
+      <th scope="row">{{loop.index}}</th>
+      <td>{{ i[0] }}</td>
+      <td>{{ i[1] }}</td>
+      <td>{{ i[2] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
