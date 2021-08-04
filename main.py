@@ -196,8 +196,7 @@ def risk_analysis(srv,r):
         h = request.form["h"]   
         t = request.form["t"]   
         print("D H T -> ",d,h,t)
-
-        
+              
 
 
         ids = describe_ec2_instance()
@@ -214,15 +213,15 @@ def risk_analysis(srv,r):
         
         
         print("Results should be back",values)
-        return redirect(url_for("lastPage",d=d,h=h,t=t,values=values))
+        return redirect(url_for("lastPage",d=d,h=h,t=t,srv=srv,values=values))
 
         
     else:
-        return render_template("risk_analysis.html",content=srv)
+        return render_template("risk_analysis.html")
 
 
-@app.route("/<d>/<h>/<t>/<values>/",methods = ["POST","GET"])
-def lastPage(d,h,t,values):
+@app.route("/<d>/<h>/<t>/<srv>/<values>/",methods = ["POST","GET"])
+def lastPage(d,h,t,srv,values):
     final = []
     values = ast.literal_eval(values)
     print("The values: ",values)
@@ -232,7 +231,7 @@ def lastPage(d,h,t,values):
         for j in i:
             # print(index,"what we want-> ",j)
             final.append(j)
-    return render_template("output.html",content=final)
+    return render_template("output.html",content=final,srv=srv)
 
 
 
@@ -267,7 +266,22 @@ def fetch_stuff():
 
 
 
-
+@app.route("/shutdownR",methods = ["POST"])
+def stop_ec2_instance():
+    global aws_access_key_id,aws_secret_access_key
+    instance_ids = describe_ec2_instance()
+    for i in instance_ids:
+        try:
+            print ("Stopping EC2 instance {i}")
+            # instance_id = describe_ec2_instance()
+            resource_ec2 = boto3.client("ec2",region_name="us-east-1",aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,aws_session_token=aws_session_token)
+            resource_ec2.stop_instances(InstanceIds=[i])
+            # resource_ec2.terminate(InstanceIds=[i])
+            print(f"{i} STOPPED")
+        except Exception as e:
+            print(e)
+    return render_template("shutdown.html",instance_ids=instance_ids)
 
 
 

@@ -1,6 +1,30 @@
 {% extends "layout.html" %} {% block header %}Resources{% endblock %} {% block
 content %}
 
+
+<div class="col-md-12">
+      <button type="submit" id="reset" class="reset btn btn-warning ml-1 my-1 float-left">Reset</button>
+      
+      <form action="/shutdownR" method="post">
+      {% if srv == "ec2"  %}
+
+      
+      <button onclick="$('#loading').show();" type="submit" id="reset" class="reset btn btn-danger ml-1 my-1 float-right">Shutdown Scalable Service</button>
+     
+      <div class="col-md-12" id="loading" style="display: none">
+        <img src="loading.gif" alt="" />Terminating EC2 Instances
+      </div>
+
+      {% else %}
+      
+      <button type="submit" id="reset" class="reset btn btn-danger ml-1 my-1 float-right" disabled>(Current service not scalable)</button>
+      </div>
+
+
+      {% endif %}
+      </form>
+      </div>
+
 <table class="table">
   <thead>
     <tr>
