@@ -192,8 +192,8 @@ def calculate_average(dd):
             print(i)
             sum95 = sum95 + i[1]
             sum99 = sum99 + i[2]
-        print("Ave: ",[i[0],sum95/no_resources,sum95/no_resources])
-        averaged.append([i[0],sum95/no_resources,sum95/no_resources])
+        print("Ave: ",[i[0],sum95/no_resources,sum99/no_resources])
+        averaged.append([i[0],sum95/no_resources,sum99/no_resources])
     return averaged
 
 
@@ -298,7 +298,7 @@ def risk_analysis(srv,r):
             # print("my length: ",len(values))
             # print("my times", times)
             values = calculate_average(the_values)
-            print("Averaged ec2 values: ",values)
+            # print("Averaged ec2 values: ",values)
             session['values'] = values
 
             print("Results should be back from ec2: ",values)
@@ -307,11 +307,14 @@ def risk_analysis(srv,r):
             the_values,times = get_values_from_lambda(r,h,d,t,data_list,df)
             # print("length: ",len(values))
             # print(" times", times)
+            for i in the_values:
+                print("== ",the_values)
             values = calculate_average(the_values)
-            session['values'] = values
-            print("Averaged Lambda values: ",values)
 
-            print("Results should be back from lambda",values)
+            session['values'] = values
+            # print("Averaged Lambda values: ",values)
+
+            # print("Results should be back from lambda",values)
 
             
         return redirect(url_for("lastPage",d=d,h=h,t=t,srv=srv))
@@ -326,8 +329,8 @@ def lastPage(d,h,t,srv):
     print('wuhuuu...', session['values'])
     final = []
     values = session['values']
-    print("The values: ",values)
-    print("hubee: ",values[0])
+    # print("The values: ",values)
+    # print("hubee: ",values[0])
     for index,i in enumerate(values):
         print("------> ",i)
 
