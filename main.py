@@ -2,7 +2,7 @@ from flask import Flask, render_template, request,redirect,url_for, jsonify
 from concurrent.futures import ThreadPoolExecutor
 import http.client
 import json
-# from finance import data
+from flask import session
 import ast
 import pickle
 import base64
@@ -10,14 +10,12 @@ import time
 import boto3
 import paramiko
 from paramiko import SSHClient
-from boto.manage.cmdshell import sshclient_from_instance
+from getData import fetch_data
 
-aws_access_key_id="ASIAYB7NMG74GA7GQ26C"
-aws_secret_access_key="2KVJ2AUQmYsNUBVa7By1V8FCxoguiupcYw2yAZkQ"
-aws_session_token="FwoGZXIvYXdzEP///////////wEaDOVO6RYCFFYZx2aOWCLEAcDq5FQUPko27uOrEoUqq66egdONcOyM72XTkS7ZTcNUu/JyeMImuuIRNfgYYE4ZZ4APy/EiNyQUTQCHlMwngklmEVUHffwlMJXEVgEDxRCAbc6lW8wXJBFiiMQYYtSbXBDsjXXqACIumjEK2QuMWpAAaF7fezIGtD3odYk6jSyC7rPL7wCETLT3FdNCKdTKEsSPLr6NybyvBeB57jQ3JFHgEc9bYFopFAV1Bpb2oXHJREsbE68Gc+1o6LTQjt4iyj4kubIo48OhiAYyLXaAfFFzvG0dqbBvw/Aw9DS3X47wTh/CssFG631vl4TnIqMn4POv0GOAj1HFrA=="
-# aws_secret_access_key=BmlktIDPEOadgSntyMil+7A0viRhy60pfLiMfwxN
-# aws_access_key_id=ASIAYB7NMG74LFSHYR6G
 
+aws_access_key_id="ASIAYB7NMG74BIRPQ4FG"
+aws_secret_access_key="EJV/GccDqSiFnQp0rj6zMMDgGhVD7HmsYbi2QvzD"
+aws_session_token="FwoGZXIvYXdzEHsaDC72J+eZrjtZgNBPuCLEAXgzP7f7XO0nYIl/45FXkJmasK7XM7ZgvXtX4YrXXu5E+U4gc0erIip8G/hQYR+J7ekcJVk0zKZn51jvnhvjLiiFXg14XXhYQ0otNyDaGIHsdRu5Oap0c9z/NGBwAO9Gmcak9X2TqKHm7/L4PQiMpPMjVg29PBZzR489IzioHNJdfabe2zdTUTn+L5gSPX3t7bZpfcsTkd4Crqbbn/SuQFK6fjP2GAtrPAW3Z5NrlUFBIgLDPvdKnPNkKFkTw0xGKti+HnAo0fK8iAYyLXDQ/IUE1TPbVQ6hbzETNQ+82aDfWBqpXV7/Y+p5Q60JZ5QC0vrqlkR3cZYA3Q=="
 
 
 user_data = '''#!/bin/bash
@@ -111,12 +109,92 @@ def get_values_from_ec2(hosts,h,d,t):
         times.append(vals['elapsed_time'])
 
 
-    print("values: ",values)
+    print("these values: ",len(values))
     print("time: ",times)
     # print("type: ",type(vals))
 
 
-    return values
+    return (values,times)
+
+def get_values_from_lambda(r,h,d,t,data_list,df):
+    values = []
+    times=[]
+
+
+    with ThreadPoolExecutor() as executor:
+        for i in range(int(r)):
+            try:    
+                print("ThreadID: ",i) 
+                data_list
+                host = "khwpxlw81b.execute-api.us-east-1.amazonaws.com"        
+                c = http.client.HTTPSConnection(host)      
+                data = {
+                    "data_list":data_list,
+                    "data":df,
+                    "h":h,
+                    "d":d,
+                    "t":t
+                }
+
+                print("sending data...",type(json.dumps(data)))
+                    
+                c.request("POST", "/default/lsa", json.dumps(data))        
+                response = c.getresponse()        
+
+
+                data = json.loads(response.read().decode('utf-8') ) 
+                print("From AWS: ",data)
+                print("MATATA: ",type(ast.literal_eval(data["op"])))
+                values.append(ast.literal_eval(data["op"]))
+                times.append(data['elapsed_time'])
+                # find average
+                
+            
+
+            except IOError:        
+                print( 'Failed to open ', host ) # Is the Lambda address correct?    
+                print(data+" from "+str(i)) # May expose threads as completing in a different order    
+                return "page "+str(i)
+            
+    return (values,times)
+
+
+        # host = "khwpxlw81b.execute-api.us-east-1.amazonaws.com/"        
+        # c = http.client.HTTPSConnection(host) 
+
+        # obj = {
+        #     "data_list":data_list,
+        #     "data":df,
+        #     "H":h,
+        #     "D":d,
+        #     "T":t
+        # }   
+            
+        # c.request("POST", "/default/lsa", json.dumps(obj))        
+        # response = c.getresponse()        
+
+
+        # data = json.loads(response.read().decode('utf-8') ) 
+        # print("From AWS: ",data)
+        # print()
+
+
+def calculate_average(dd):
+    print(len(dd))
+    averaged = []
+    no_resources = len(dd)
+    for index,item in enumerate(zip(*dd)):
+        print("*"*50)
+        print(item)
+        sum95 =0
+        sum99 =0
+        for i in item:
+            print(i)
+            sum95 = sum95 + i[1]
+            sum99 = sum99 + i[2]
+        print("Ave: ",[i[0],sum95/no_resources,sum95/no_resources])
+        averaged.append([i[0],sum95/no_resources,sum95/no_resources])
+    return averaged
 
 
 
@@ -195,74 +273,97 @@ def risk_analysis(srv,r):
         d = request.form["d"]    
         h = request.form["h"]   
         t = request.form["t"]   
+
         print("D H T -> ",d,h,t)
+
+        data = fetch_data()
+        data_list = data.Close.values.tolist()
+        df = data.values.tolist()
+
+
               
 
+        if srv == "ec2":
+            ids = describe_ec2_instance()
+            print("instance_ids",ids)
 
-        ids = describe_ec2_instance()
-        print("instance_ids",ids)
+            for i in ids:
 
-        for i in ids:
+                ip.append(get_public_ip(i))
 
-            ip.append(get_public_ip(i))
+            res = [x for x in ip if x is not None]
+            print(res)
 
-        res = [x for x in ip if x is not None]
-        print(res)
+            the_values,times = get_values_from_ec2(res,h,d,t)
+            # print("my length: ",len(values))
+            # print("my times", times)
+            values = calculate_average(the_values)
+            print("Averaged ec2 values: ",values)
+            session['values'] = values
 
-        values = get_values_from_ec2(res,h,d,t)
-        
-        
-        print("Results should be back",values)
-        return redirect(url_for("lastPage",d=d,h=h,t=t,srv=srv,values=values))
+            print("Results should be back from ec2: ",values)
+        else: #lambda
+            print("to lambda")
+            the_values,times = get_values_from_lambda(r,h,d,t,data_list,df)
+            # print("length: ",len(values))
+            # print(" times", times)
+            values = calculate_average(the_values)
+            session['values'] = values
+            print("Averaged Lambda values: ",values)
+
+            print("Results should be back from lambda",values)
+
+            
+        return redirect(url_for("lastPage",d=d,h=h,t=t,srv=srv))
 
         
     else:
         return render_template("risk_analysis.html")
 
 
-@app.route("/<d>/<h>/<t>/<srv>/<values>/",methods = ["POST","GET"])
-def lastPage(d,h,t,srv,values):
+@app.route("/<d>/<h>/<t>/<srv>/",methods = ["POST","GET"])
+def lastPage(d,h,t,srv):
+    print('wuhuuu...', session['values'])
     final = []
-    values = ast.literal_eval(values)
+    values = session['values']
     print("The values: ",values)
     print("hubee: ",values[0])
     for index,i in enumerate(values):
         print("------> ",i)
-        for j in i:
-            # print(index,"what we want-> ",j)
-            final.append(j)
+
+        final.append(i)
     return render_template("output.html",content=final,srv=srv)
 
 
 
-def fetch_stuff():
-    global data
-    with ThreadPoolExecutor() as executor:
+# def fetch_stuff():
+#     global data
+#     with ThreadPoolExecutor() as executor:
 
-        host = "wi0m4i6mlc.execute-api.us-east-1.amazonaws.com"        
-        c = http.client.HTTPSConnection(host) 
+#         host = "wi0m4i6mlc.execute-api.us-east-1.amazonaws.com"        
+#         c = http.client.HTTPSConnection(host) 
         
-        # df = data.head().to_json()  
-        pickled = pickle.dumps(data.head())
-        pickled_b64 = base64.b64encode(pickled)
-        hug_pickled_str = pickled_b64.decode('utf-8')
-        print(hug_pickled_str)
+#         # df = data.head().to_json()  
+#         pickled = pickle.dumps(data.head())
+#         pickled_b64 = base64.b64encode(pickled)
+#         hug_pickled_str = pickled_b64.decode('utf-8')
+#         print(hug_pickled_str)
 
-        obj = {
-            "data":hug_pickled_str,
-            "H":200,
-            "D":100000,
-            "T":1
-        }   
+#         obj = {
+#             "data":hug_pickled_str,
+#             "H":200,
+#             "D":100000,
+#             "T":1
+#         }   
             
-        c.request("POST", "/default/lsa", json.dumps(obj))        
-        response = c.getresponse()        
+#         c.request("POST", "/default/lsa", json.dumps(obj))        
+#         response = c.getresponse()        
 
 
-        data = json.loads(response.read().decode('utf-8') ) 
-        print("From AWS: ",data)
-        print()
-        # print("body: ",json.loads(ast.literal_eval(data["body"])["data"]))
+#         data = json.loads(response.read().decode('utf-8') ) 
+#         print("From AWS: ",data)
+#         print()
+#         # print("body: ",json.loads(ast.literal_eval(data["body"])["data"]))
 
 
 
@@ -343,10 +444,7 @@ def audit():
 
 
 
-# Default port:
-if __name__ == '__main__':
-    # fetch_stuff()
-    app.run(debug=True)
+
     
 
 # Or specify port manually:
@@ -355,3 +453,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 '''
+
+if __name__ == '__main__':
+    app.secret_key = 'supersecretkey'
+    app.run(debug=True)
