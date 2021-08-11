@@ -1,0 +1,58 @@
+{% extends "base.html" %} {% block content %} {% block head %}
+<style>
+  #parent_div_1,
+  #parent_div_2 {
+    width: 100px;
+    height: 100px;
+    border: 1px solid red;
+    margin-right: 10px;
+    float: left;
+  }
+  .child_div_1 {
+    float: left;
+    margin-right: 5px;
+  }
+</style>
+
+{% endblock %}
+
+<form method="POST" action="#">
+  <!-- <p><input type="text" name="nm" /></p> -->
+  <label for="cars">Choose a resource(ec2/lambda):</label>
+  <select name="type_of_service" id="type_of_service">
+    <option value="ec2">AWS EC2</option>
+    <option value="lambda">AWS Lambda</option>
+  </select>
+  <br /><br />
+
+  <div class="form-group">
+    <label for="exampleFormControlSelect2">How many resources?</label>
+    <input type="radio" name="num_of_resources" id="1" value="1" />
+    <label for="1">1</label>
+
+    <input type="radio" name="num_of_resources" id="2" value="2" />
+    <label for="2">2</label>
+
+    <input type="radio" name="num_of_resources" id="3" value="3" />
+    <label for="3">3</label>
+
+    <input type="radio" name="num_of_resources" id="4" value="4" />
+    <label for="4">4</label>
+
+    <input type="radio" name="num_of_resources" id="5" value="5" />
+    <label for="5">5</label>
+
+    <input type="radio" name="num_of_resources" id="6" value="6" />
+    <label for="6">6</label>
+
+    <input type="radio" name="num_of_resources" id="7" value="7" />
+    <label for="7">7</label>
+
+    <input type="radio" name="num_of_resources" id="8" value="8" />
+    <label for="8">8</label>
+  </div>
+  <br /><br /><br /><br />
+  <button>Warm up</button>
+</form>
+
+{% endblock %}

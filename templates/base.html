@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <title></title>
+    <style>
+      ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #333;
+      }
+
+      li {
+        float: left;
+        border-right: 1px solid #bbb;
+      }
+
+      li:last-child {
+        border-right: none;
+      }
+
+      li a {
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+      }
+
+      li a:hover:not(.active) {
+        background-color: #111;
+      }
+
+      .active {
+        background-color: #04aa6d;
+      }
+      .center {
+        margin: auto;
+        width: auto;
+        border: 3px solid #333;
+        padding: 10px;
+      }
+      .button {
+        background-color: #4caf50; /* Green */
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin-right: 10px;
+      }
+    </style>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <ul>
+      <li><a class="navbar-brand" href="{{ url_for('index') }}">Home</a></li>
+      <li>
+        <a class="nav-link" style="float: right" href="{{ url_for('audit') }}"
+          >Audit</a
+        >
+      </li>
+
+      <div id="content"></div>
+    </ul>
+
+    <div class="center" style="margin-top: 40px">
+      {% block content %}{% endblock %}
+    </div>
+    <script>
+      var el = document.getElementById("content");
+      var content;
+      var url = window.location.pathname;
+      console.log(url);
+      console.log(url.search("ec2"));
+
+      if (url.search("ec2") == -1 && url.search("lambda") == -1) {
+        content = "";
+      } else {
+        content = `
+        <form action="/reset" method="post">
+              <button type="submit" id="reset" class="button" style="float: right">Reset</button>
+        </form>
+
+        <form action="/terminateInstances" method="post">
+        {% if srv == "ec2"  %}
+
+
+        <button type="submit" class="button" id="reset" style="float: right">Shutdown EC2(scalable)</button>
+
+        <div  style="display: none">
+          <img alt="" />Killing EC2 Instances
+        </div>
+
+        {% else %}
+
+        <button type="submit" id="reset" class="button" style="float: right; background-color: red" disabled>Lambda is not scalable</button>
+        </div>
+
+
+        {% endif %}
+        </form>`;
+      }
+
+      el.insertAdjacentHTML("afterbegin", content);
+    </script>
+  </body>
+</html>

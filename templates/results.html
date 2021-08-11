@@ -1,0 +1,86 @@
+{% extends "base.html" %} {% block head %}
+<head>
+  <script
+    type="text/javascript"
+    src="https://www.gstatic.com/charts/loader.js"
+  ></script>
+  <style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+
+    function drawChart() {
+      var data = {{ content|tojson }}
+
+    console.log(data)
+      plot = [["Day", "95%", "99%"]]
+
+      for (i = 0; i < data.length; i++) {
+        //console.log(data[i][0])
+        console.log([data[i][0],data[i][1],data[i][2]])
+        plot.push([data[i][0],data[i][1],data[i][2]])
+
+      }
+
+      console.log(plot)
+
+      var data = google.visualization.arrayToDataTable(plot);
+
+      var options = {
+        title: 'Risk values',
+        curveType: 'function',
+        legend: { position: 'right' }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+      chart.draw(data, options);
+    }
+  </script>
+  
+  
+  
+  </head
+>{% endblock %} {% block content %}
+
+
+      
+      <div id="curve_chart" style="width: 100%; height: 500px"></div>
+      <table>
+   <tr>
+        <th scope="col">#</th>
+        <th scope="col">Date</th>
+        <th scope="col">95%</th>
+        <th scope="col">99%</th>
+      </tr>
+
+      {% for i in content %}
+      <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>{{ i[0] }}</td>
+        <td>{{ i[1] }}</td>
+        <td>{{ i[2] }}</td>
+      </tr>
+      
+      {% endfor %}
+  </table>
+
+  {% endblock %}
+</div>

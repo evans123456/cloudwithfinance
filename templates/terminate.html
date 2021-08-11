@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block content %}
+
+<div class="center" style="margin: auto">
+  <h3>Terminated instances</h3>
+  {% for i in instance_ids %}
+  <li>{{i}}</li>
+  <br />
+  {% endfor %}
+</div>
+
+{% endblock %}

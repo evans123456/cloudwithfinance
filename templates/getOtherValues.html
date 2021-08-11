@@ -1,0 +1,37 @@
+{% extends "base.html" %}{% block head%} {% endblock %} {% block header
+%}Service{% endblock %} {% block content %}
+<div >
+<form method="POST" action="#">
+  <p>...Resources warmed up successfully...</p> 
+   <div >
+    <label for="h">H</label>
+    <input type="number" name="h" class="form-control" id="h" placeholder="history">
+ 
+  </div>
+  <br/><br/>
+   <div >
+    <label for="d">D</label>
+    <input type="number" name="d" class="form-control" id="d" placeholder="no. of shots">
+  </div>
+  <br/><br/>
+
+<div >
+    <label for="t">T</label>
+  <input type="radio" name="t" id="t" value="1" />
+    <label for="1">Buy</label>
+
+    <input type="radio" name="t" id="t" value="2" />
+    <label for="2">Sell</label>
+  </div>
+
+<br/><br/>
+
+  <button
+
+  >
+    Submit
+  </button>
+  </div>
+</form>
+
+{% endblock %}
